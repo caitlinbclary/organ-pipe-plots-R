@@ -5,7 +5,7 @@
 #              Caitlin Clary, Biostat Global Consulting
 # Delivered:   2017-01-28
 # Updated:     2019-03-26
-#              2020-07-30       Demo with updated function
+#              2020-08-05       Demo updated function
 #
 # Input Data:  testdata_indiv_level.csv
 # Required Functions: opplot.R
@@ -39,8 +39,8 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
   ## Plotting Examples
 
   # Example 1 ----
-  # All function options are listed, default appearance options selected
-  # Plots to screen, does not save plot to disk
+  # All function options are listed, default appearance options selected.
+  # Plots to screen, does not save plot to disk (output_to_screen = TRUE).
 
   opplot(dat = inData, stratvar = "stratum", clustvar = "clusterid",
          weightvar = "svyweight", yvar = "y", stratum = "Stratum A",
@@ -57,7 +57,7 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
          ytitle2 = "Number of Respondents", yround2 = 5)
 
   # Example 2 ----
-  # Same as example 1, but with sample size plotted (plotn = TRUE)
+  # Modifying example 1 plot to include cluster sample size (plotn = TRUE).
 
   opplot(dat = inData, stratvar = "stratum", clustvar = "clusterid",
          weightvar = "svyweight", yvar = "y", stratum = "Stratum A",
@@ -74,25 +74,29 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
          ytitle2 = "Number of Respondents", yround2 = 5)
 
   # Example 3 ----
-  # Minimal example, plotting clusters in all strata in dataset
-  # Because of the number of clusters, this plot is not very readable
+  # Minimal example, plotting clusters in all strata in dataset (stratvar and
+  # stratum arguments are not provided, so all strata are used).
+  # Because of the number of clusters, this plot is not very readable.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y")
 
   # Example 4 ----
-  # Same as example 3, but increasing plot dimensions to improve plot legibility
+  # Modifying example 3 plot, increasing plot dimensions to improve legibility.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y",
          sizew = 20, sizeh = 12)
 
   # Example 5 ----
-  # Minimal example, plotting a single stratum
+  # Minimal example, plotting a single stratum (stratum = "Stratum A").
+  # stratvar = "stratum" is provided so the function can identify the
+  # observations belonging to stratum A.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y",
          stratvar = "stratum", stratum = "Stratum A")
 
   # Example 6 ----
-  # Saving plot to disk as a PDF
+  # Plotting Stratum B and saving plot to disk as a PDF (by specifying the
+  # filename, platform, and output_to_screen arguments).
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y",
          stratvar = "stratum", stratum = "Stratum B",
@@ -100,31 +104,47 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
          output_to_screen = FALSE)
 
   # Example 7 ----
-  # Saving plot to disk as a PNG, adding cluster size line, changing colors
+  # Plotting Stratum G, saving to disk as a PNG, adding cluster size line
+  # (plotn = TRUE), and changing bar colors with barcolor1 and barcolor2.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum B",
-         filename = "StratumB", platform = "png",
+         stratvar = "stratum", stratum = "Stratum G",
+         filename = "StratumG", platform = "png",
          output_to_screen = FALSE,
          plotn = TRUE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
-         barcolor1 = "#004709",
+         barcolor1 = "#2b84e1",
          barcolor2 = "#e1e1e1",
-         title = "Organ Pipe Plot: Stratum B")
+         title = "Organ Pipe Plot: Stratum G")
 
   # Example 8 ----
-  # Changing bar colors, line color, line pattern
+  # Plotting Stratum H, saving to disk as a WMF, changing y axis increments
+  # (yby = 25).
+
+  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
+         stratvar = "stratum", stratum = "Stratum H",
+         filename = "StratumH", platform = "wmf",
+         output_to_screen = FALSE,
+         yby = 25,
+         plotn = TRUE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
+         barcolor1 = "#a8737d",
+         barcolor2 = "white",
+         title = "Organ Pipe Plot: Stratum H")
+
+  # Example 9 ----
+  # Plotting stratum C, changing color (nlinecolor), width (nlinewidth), and
+  # pattern (nlinepattern) of the line showing number of respondents.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
          stratvar = "stratum", stratum = "Stratum C",
          output_to_screen = TRUE,
-         plotn = TRUE, nlinecolor = "grey20", nlinewidth = 1, nlinepattern = 3,
+         plotn = TRUE, nlinecolor = "grey40", nlinewidth = 2, nlinepattern = 3,
          barcolor1 = "lightcoral",
          barcolor2 = "floralwhite",
          linecolor1 = "white", linecolor2 = "white",
          title = "Stratum C")
 
-  # Example 9 ----
-  # Changing the plot dimensions
+  # Example 10 ----
+  # Plotting stratum D, changing the plot dimensions.
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
          stratvar = "stratum", stratum = "Stratum D",
@@ -133,13 +153,13 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
          sizew = 9, sizeh = 6,
          barcolor1 = "lightcoral",
          barcolor2 = "white",
-         linecolor1 = "white", linecolor2 = "white",
+         linecolor1 = "white", linecolor2 = "grey80",
          title = "Stratum D")
 
-  # Example 10 ----
+  # Example 11 ----
   # Instead of providing stratvar and stratum arguments, instead providing a
   # filtered dataset with only the stratum of interest. Produces the same plot
-  # as example 9.
+  # as example 10.
 
   subset_data <- inData[inData$stratum == "Stratum D",]
 
@@ -149,10 +169,28 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
          sizew = 9, sizeh = 6,
          barcolor1 = "lightcoral",
          barcolor2 = "white",
-         linecolor1 = "white", linecolor2 = "white",
+         linecolor1 = "white", linecolor2 = "grey80",
          title = "Stratum D")
 
-  # Example 11 ----
+  # Example 12 ----
+  # The stratum variable can be numeric rather than character. This plot of
+  # stratum 4 is the same as the plot of stratum D in examples 10 and 11.
+
+  # Recode stratum variable as numeric
+  inDataNumeric <- inData
+  inDataNumeric$stratum <- as.numeric(as.factor(inDataNumeric$stratum))
+
+  opplot(dat = inDataNumeric, clustvar = "clusterid", yvar = "y",
+         weightvar = "svyweight", stratvar = "stratum", stratum = 4,
+         output_to_screen = TRUE,
+         plotn = TRUE, nlinecolor = "grey20", nlinewidth = 1, nlinepattern = 3,
+         sizew = 9, sizeh = 6,
+         barcolor1 = "lightcoral",
+         barcolor2 = "white",
+         linecolor1 = "white", linecolor2 = "grey80",
+         title = "Stratum 4")
+
+  # Example 13 ----
   # Specifying the savedata argument, which creates a .csv dataset with
   # information on each bar (cluster) in the plot.
 
