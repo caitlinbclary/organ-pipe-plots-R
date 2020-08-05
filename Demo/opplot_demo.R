@@ -89,16 +89,18 @@ source("C:/Documents/organ-pipe-plots-R/opplot.R")
   # Example 5 ----
   # Minimal example, plotting a single stratum (stratum = "Stratum A").
   # stratvar = "stratum" is provided so the function can identify the
-  # observations belonging to stratum A.
+  # observations belonging to stratum A. No weights are used (no weightvar
+  # argument in this function call).
 
   opplot(dat = inData, clustvar = "clusterid", yvar = "y",
          stratvar = "stratum", stratum = "Stratum A")
 
   # Example 6 ----
-  # Plotting Stratum B and saving plot to disk as a PDF (by specifying the
-  # filename, platform, and output_to_screen arguments).
+  # Plotting Stratum B, adding weight argument (weightvar = "svyweight"), and
+  # saving plot to disk as a PDF (by specifying the filename, platform, and
+  # output_to_screen arguments).
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y",
+  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
          stratvar = "stratum", stratum = "Stratum B",
          filename = "StratumB", platform = "pdf",
          output_to_screen = FALSE)
