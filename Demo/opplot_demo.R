@@ -31,7 +31,7 @@ library(dplyr); library(stringr); library(ggplot2); library(doBy)
 dir <- "C:/Users/clary/Biostat Global Dropbox/Caitlin Clary/CBC GitHub Repos/organ-pipe-plots-R/"
 
 # Source the opplot.R function
-source(paste0(dir, "opplot_dev.R"))
+source(paste0(dir, "opplot.R"))
 
 # Read in data for plotting
 inData <- read.csv(file = paste0(dir, "Demo/testdata_indiv_level.csv"),
