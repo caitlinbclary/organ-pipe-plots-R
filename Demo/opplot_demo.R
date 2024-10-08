@@ -1,214 +1,334 @@
-##############################################################################
 # Program:     opplot_demo.r
 # Purpose:     Demonstrate making organ pipe plots
 # Author:      Mary Prier, Biostat Global Consulting
-#              Caitlin Clary, Biostat Global Consulting
+#              Caitlin B. Clary, Biostat Global Consulting
+
 # Delivered:   2017-01-28
 # Updated:     2019-03-26
 #              2020-08-05       Demo updated function
-#
+#              2024-10-08       Update demo examples, including new features
+
 # Input Data:  testdata_indiv_level.csv
 # Required Functions: opplot.R
-# Required Packages: doBy
-###############################################################################
+# Required Packages: dplyr, stringr, ggplot2, doBy
+
+# Note: see the end of this R file for comments explaining each argument to the
+# opplot function
+
+# Setup ----
 
 # Get needed packages if not already installed
-if("doBy" %in% rownames(installed.packages()) == FALSE){
-  install.packages("doBy")}
+pkg_list <- c("dplyr", "stringr", "ggplot2", "doBy")
+for(i in seq_along(pkg_list)){
+  if (!pkg_list[i] %in% rownames(installed.packages())){install.packages(pkg_list[i])}
+}
 
 # Load required packages
-library(doBy)
+library(dplyr); library(stringr); library(ggplot2); library(doBy)
+
+# Define directory where organ pipe plot function and demo data are saved
+# Modify this line to use the right path on your computer!
+dir <- "C:/Users/clary/Biostat Global Dropbox/Caitlin Clary/CBC GitHub Repos/organ-pipe-plots-R/"
 
 # Source the opplot.R function
-# Change this file path to point to the program's location on your computer
-source("C:/Documents/organ-pipe-plots-R/opplot.R")
+source(paste0(dir, "opplot_dev.R"))
 
-# Set file paths (change paths to point to directories on your computer)
-  # inPath = directory holding the data
-  inPath <- file.path("C:/Documents/organ-pipe-plots-R/Demo")
-  # outPath = where to save output
-  outPath <- file.path("C:/Documents/organ-pipe-plots-R/Demo")
+# Read in data for plotting
+inData <- read.csv(file = paste0(dir, "Demo/testdata_indiv_level.csv"),
+                   header = TRUE)
 
-  # To save output in the right location, set working directory to outPath
-  setwd(outPath)
+# Plot examples ----
 
-  # Read in data for plotting
-  inData <- read.csv(file = file.path(inPath,"testdata_indiv_level.csv"),
-                     header = TRUE)
+## Example 1 ----
+## Plot stratum A with default appearance options, output plot to screen
 
-  ## Plotting Examples
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum A", output_to_screen = TRUE
+)
 
-  # Example 1 ----
-  # All function options are listed, default appearance options selected.
-  # Plots to screen, does not save plot to disk (output_to_screen = TRUE).
+## Example 2 ----
+## Add title, subtitle, and footnote; add line showing # of respondents per cluster
 
-  opplot(dat = inData, stratvar = "stratum", clustvar = "clusterid",
-         weightvar = "svyweight", yvar = "y", stratum = "Stratum A",
-         barcolor1 = "hot pink", barcolor2 = "white",
-         linecolor1 = "gray", linecolor2 = "gray",
-         ylabel = "Percent of Cluster",
-         ymin = 0, ymax = 100, yby = 50,
-         title = "This is the title line",
-         subtitle = "This is the subtitle line",
-         footnote = "Footnote",
-         output_to_screen = TRUE, filename = file.path(outPath, "test2"),
-         platform = "pdf", sizew = 7, sizeh = 6, savedata = "",
-         plotn = FALSE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
-         ytitle2 = "Number of Respondents", yround2 = 5)
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum A", output_to_screen = TRUE,
 
-  # Example 2 ----
-  # Modifying example 1 plot to include cluster sample size (plotn = TRUE).
+  title = "Stratum A",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  opplot(dat = inData, stratvar = "stratum", clustvar = "clusterid",
-         weightvar = "svyweight", yvar = "y", stratum = "Stratum A",
-         barcolor1 = "hot pink", barcolor2 = "white",
-         linecolor1 = "gray", linecolor2 = "gray",
-         ylabel = "Percent of Cluster",
-         ymin = 0, ymax = 100, yby = 50,
-         title = "This is the title line",
-         subtitle = "This is the subtitle line",
-         footnote = "Footnote",
-         output_to_screen = TRUE, filename = file.path(outPath, "test2"),
-         platform = "pdf", sizew = 7, sizeh = 6, savedata = "",
-         plotn = TRUE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
-         ytitle2 = "Number of Respondents", yround2 = 5)
+  plotn = TRUE
+)
 
-  # Example 3 ----
-  # Minimal example, plotting clusters in all strata in dataset (stratvar and
-  # stratum arguments are not provided, so all strata are used).
-  # Because of the number of clusters, this plot is not very readable.
+## Example 3 ----
+## Plot stratum C, defining high and low coverage thresholds
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y")
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum C", output_to_screen = TRUE,
 
-  # Example 4 ----
-  # Modifying example 3 plot, increasing plot dimensions to improve legibility.
+  title = "Stratum C",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y",
-         sizew = 20, sizeh = 12)
+  plotn = TRUE,
 
-  # Example 5 ----
-  # Minimal example, plotting a single stratum (stratum = "Stratum A").
-  # stratvar = "stratum" is provided so the function can identify the
-  # observations belonging to stratum A. No weights are used (no weightvar
-  # argument in this function call).
+  covgcategories = TRUE,
+  lowcovgthreshold = 40,
+  highcovgthreshold = 80
+)
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y",
-         stratvar = "stratum", stratum = "Stratum A")
+## Example 4 ----
+## Add lines indicating coverage thresholds and customize line color. Note that
+## colors can be specified as R color names or as hex color codes.
 
-  # Example 6 ----
-  # Plotting Stratum B, adding weight argument (weightvar = "svyweight"), and
-  # saving plot to disk as a PDF (by specifying the filename, platform, and
-  # output_to_screen arguments).
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum C", output_to_screen = TRUE,
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum B",
-         filename = "StratumB", platform = "pdf",
-         output_to_screen = FALSE)
+  title = "Stratum C",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  # Example 7 ----
-  # Plotting Stratum G, saving to disk as a PNG, adding cluster size line
-  # (plotn = TRUE), and changing bar colors with barcolor1 and barcolor2.
+  plotn = TRUE,
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum G",
-         filename = "StratumG", platform = "png",
-         output_to_screen = FALSE,
-         plotn = TRUE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
-         barcolor1 = "#2b84e1",
-         barcolor2 = "#e1e1e1",
-         title = "Organ Pipe Plot: Stratum G")
+  covgcategories = TRUE,
+  lowcovgthreshold = 40,
+  highcovgthreshold = 80,
 
-  # Example 8 ----
-  # Plotting Stratum H, saving to disk as a WMF, changing y axis increments
-  # (yby = 25).
+  lowcovgthresholdline = TRUE,
+  highcovgthresholdline = TRUE,
+  lowcovgthresholdlinecolor = "darkred",
+  highcovgthresholdlinecolor = "forestgreen"
+)
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum H",
-         filename = "StratumH", platform = "wmf",
-         output_to_screen = FALSE,
-         yby = 25,
-         plotn = TRUE, nlinecolor = "black", nlinewidth = 1, nlinepattern = 2,
-         barcolor1 = "#a8737d",
-         barcolor2 = "white",
-         title = "Organ Pipe Plot: Stratum H")
+## Example 5 ----
+## Plotting clusters in *all* strata in dataset - because of the number of
+## clusters, this plot is not very readable!
 
-  # Example 9 ----
-  # Plotting stratum C, changing color (nlinecolor), width (nlinewidth), and
-  # pattern (nlinepattern) of the line showing number of respondents.
+opplot(dat = inData, clustvar = "clusterid", yvar = "y",
+       output_to_screen = TRUE)
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum C",
-         output_to_screen = TRUE,
-         plotn = TRUE, nlinecolor = "grey40", nlinewidth = 2, nlinepattern = 3,
-         barcolor1 = "lightcoral",
-         barcolor2 = "floralwhite",
-         linecolor1 = "white", linecolor2 = "white",
-         title = "Stratum C")
+## Example 6 ----
+## Modify example 2, adding weightvar argument, customize colors and n line appearance
 
-  # Example 10 ----
-  # Plotting stratum D, changing the plot dimensions.
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  weightvar = "svyweight",
+  stratum = "Stratum A", output_to_screen = TRUE,
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum D",
-         output_to_screen = TRUE,
-         plotn = TRUE, nlinecolor = "grey20", nlinewidth = 1, nlinepattern = 3,
-         sizew = 9, sizeh = 6,
-         barcolor1 = "lightcoral",
-         barcolor2 = "white",
-         linecolor1 = "white", linecolor2 = "grey80",
-         title = "Stratum D")
+  barcolor1 = "#0b5394",
+  barcolor2 = "#cfe2f3",
+  linecolor1 = "#eeeeee",
+  linecolor2 = "#eeeeee",
 
-  # Example 11 ----
-  # Instead of providing stratvar and stratum arguments, instead providing a
-  # filtered dataset with only the stratum of interest. Produces the same plot
-  # as example 10.
+  title = "Stratum A",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  subset_data <- inData[inData$stratum == "Stratum D",]
+  plotn = TRUE,
+  nlinecolor = "#fff469",
+  nlinewidth = 0.8,
+  nlinepattern = 2
+)
 
-  opplot(dat = subset_data, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         output_to_screen = TRUE,
-         plotn = TRUE, nlinecolor = "grey20", nlinewidth = 1, nlinepattern = 3,
-         sizew = 9, sizeh = 6,
-         barcolor1 = "lightcoral",
-         barcolor2 = "white",
-         linecolor1 = "white", linecolor2 = "grey80",
-         title = "Stratum D")
+## Example 7 ----
+## Plot Stratum D, save to disk as PNG and plot to screen
 
-  # Example 12 ----
-  # The stratum variable can be numeric rather than character. This plot of
-  # stratum 4 is the same as the plot of stratum D in examples 10 and 11.
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum D", output_to_screen = TRUE,
+  filename = "Q:/opplot_test_example_7",
+  platform = "png",
 
-  # Recode stratum variable as numeric
-  inDataNumeric <- inData
-  inDataNumeric$stratum <- as.numeric(as.factor(inDataNumeric$stratum))
+  title = "Stratum D",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  opplot(dat = inDataNumeric, clustvar = "clusterid", yvar = "y",
-         weightvar = "svyweight", stratvar = "stratum", stratum = 4,
-         output_to_screen = TRUE,
-         plotn = TRUE, nlinecolor = "grey20", nlinewidth = 1, nlinepattern = 3,
-         sizew = 9, sizeh = 6,
-         barcolor1 = "lightcoral",
-         barcolor2 = "white",
-         linecolor1 = "white", linecolor2 = "grey80",
-         title = "Stratum 4")
+  plotn = TRUE
+)
 
-  # Example 13 ----
-  # Specifying the savedata argument, which creates a .csv dataset with
-  # information on each bar (cluster) in the plot.
+## Example 8 ----
+## Update example 7, this time saving as PDF, changing plot dimensions, and
+## changing Y axis increments, and changing main Y axis title
 
-  opplot(dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
-         stratvar = "stratum", stratum = "Stratum D",
-         output_to_screen = TRUE,
-         savedata = "Stratum_D_data")
+opplot(
+  dat = inData, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = "Stratum D", output_to_screen = TRUE,
+  filename = "Q:/opplot_test_example_8",
+  platform = "pdf",
+  sizew = 12,
+  sizeh = 8,
 
-  # Read in and view the dataset just created
-  strat_D <- read.csv("Stratum_D_data.csv")
-  View(strat_D)
+  ylabel = "Cluster Coverage (%)",
+  yby = 25,
 
-  # Clean up ----
+  title = "Stratum D",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
 
-  # Close all graphics printed to the screen
-  graphics.off()
+  plotn = TRUE
+)
 
-  # Remove data and other objects
-  rm(list = "inPath", "outPath", "inData", "subset_data", "strat_D")
+## Example 9 ----
+## Instead of providing stratvar and stratum arguments, filter the input dataset
+## to contain only the stratum of interest. This approach produces the same plot
+## as example 8.
+
+subset_data <- inData[inData$stratum == "Stratum D",]
+
+opplot(
+  dat = subset_data, clustvar = "clusterid", yvar = "y",
+  output_to_screen = TRUE,
+
+  ylabel = "Cluster Coverage (%)",
+  yby = 25,
+
+  title = "Stratum D",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
+
+  plotn = TRUE
+)
+
+## Example 10 ----
+## The stratum variable can be numeric rather than character. This plot of
+## stratum 4 is the same as the plot of stratum D in examples 8 and 9
+
+# Recode stratum variable as numeric
+inDataNumeric <- inData
+inDataNumeric$stratum <- as.numeric(as.factor(inDataNumeric$stratum))
+
+opplot(
+  dat = inDataNumeric, stratvar = "stratum", clustvar = "clusterid", yvar = "y",
+  stratum = 4, output_to_screen = TRUE,
+
+  ylabel = "Cluster Coverage (%)",
+  yby = 25,
+
+  title = "Stratum D",
+  subtitle = "Coverage and respondents per cluster",
+  footnote = "Dashed line indicates respondents per cluster; see Y axis on the right side of the plot.",
+
+  plotn = TRUE
+)
+
+## Example 11 ----
+## Specifying the savedata argument, which creates a dataset with
+## information on each bar (cluster) in the plot.
+
+opplot(
+  dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
+  stratvar = "stratum", stratum = "Stratum D",
+  output_to_screen = TRUE,
+  savedata = "Q:/opplot_test_example_11_stratum_D_data",
+  savedatatype = "csv"
+)
+
+# Read in and view the dataset just created
+strat_D <- read.csv("Q:/opplot_test_example_11_stratum_D_data.csv")
+View(strat_D)
+
+## Example 12 ----
+## Saving data as a .rds file instead of a .csv
+
+opplot(
+  dat = inData, clustvar = "clusterid", yvar = "y", weightvar = "svyweight",
+  stratvar = "stratum", stratum = "Stratum D",
+  output_to_screen = TRUE,
+  savedata = "Q:/opplot_test_example_11_stratum_D_data",
+  savedatatype = "rds"
+)
+
+# Read in and view the dataset just created
+strat_D <- readRDS("Q:/opplot_test_example_11_stratum_D_data.rds")
+View(strat_D)
+
+# Clean up ----
+
+# Close all graphics printed to the screen
+graphics.off()
+
+# Remove data and other objects
+rm(list = "inData", "inDataNumeric", "subset_data", "strat_D", "dir", "i",
+   "pkg_list", "opplot", "vcqi_check_color")
+
+
+# Notes: function arguments ----
+
+# # Required arguments: dat, clustvar, yvar
+# dat,
+# clustvar,
+# yvar,
+#
+# # Optional arguments
+#
+# ## Define variables with information on weights and strata
+# weightvar = NA,
+# stratvar = NA,
+#
+# ## Specific stratum to plot results for
+# stratum = "",
+#
+# barcolor1 = "hotpink",  # Color for portion of bar where yvar = 1
+# barcolor2 = "white",    # Color for portion of bar where yvar = 1
+# linecolor1 = "gray",    # Color for lines separating lower portion of bars
+# linecolor2 = "gray",    # Color for lines separating upper portion of bars
+#
+# ylabel = "Percent of Cluster",  # Label for y axis
+# ymin = 0,   # Minimum value for Y axis
+# ymax = 100, # Maximum value for Y axis
+# yby = 50,   # Increment for Y axis breaks
+#
+# title = "",    # Title of the plot
+# subtitle = "", # Subtitle of the plot
+# footnote = "", # Footnote of the plot
+#
+# plotn = FALSE,        # Plot a line showing the # of respondents in each cluster
+# nlinecolor = "black", # Color of line indicating # of respondents
+# nlinewidth = 0.75,    # Width of line indicating # of respondents
+# nlinepattern = 2,     # Pattern of line indicating # of respondents
+# ytitle2 = "Number of Respondents", # Label for secondary Y axis
+# yround2 = 5,                       # Increment for secondary Y axis breaks
+#
+# covgcategories = FALSE, # Stratify plot into high, medium, & low coverage categories
+#
+# ## The numeric percent value (0-100) used to identify low coverage; clusters
+# ## with coverage less than or equal to this number will be assigned to the low
+# ## coverage category. Used when covgcategories = TRUE.
+# lowcovgthreshold = NA,
+#
+# ## The numeric percent value (0-100) used to identify high coverage; clusters
+# ## with coverage greater than or equal to this number will be assigned to the
+# ## high coverage category. Used when covgcategories = TRUE.
+# highcovgthreshold = NA,
+#
+# barcolorhigh1 = "#67A9CF", # Color for portion of high coverage bars where yvar = 1
+# barcolormid1 = "#000080",  # Color for portion of medium coverage bars where yvar = 1
+# barcolorlow1 = "#FF5B00",  # Color for portion of low coverage bars where yvar = 1
+# barcolorhigh2 = "#f0f0f0", # Color for portion of high coverage bars where yvar = 0
+# barcolormid2 = "#f0f0f0",  # Color for portion of medium coverage bars where yvar = 0
+# barcolorlow2 = "#f0f0f0",  # Color for portion of low coverage bars where yvar = 0
+#
+# linecolorhigh1 = "gray", # Color for lines separating lower portion of high covg bars
+# linecolormid1 = "gray",  # Color for lines separating lower portion of medium covg bars
+# linecolorlow1 = "gray",  # Color for lines separating lower portion of low covg bars
+# linecolorhigh2 = "gray", # Color for lines separating upper portion of high covg bars
+# linecolormid2 = "gray",  # Color for lines separating upper portion of medium covg bars
+# linecolorlow2 = "gray",  # Color for lines separating upper portion of low covg bars
+#
+# lowcovgthresholdline = FALSE,  # Show line indicating low coverage threshold
+# highcovgthresholdline = FALSE, # Show line indicating high coverage threshold
+#
+# lowcovgthresholdlinecolor = "red",  # Color for lowcovgthresholdline
+# highcovgthresholdlinecolor = "red", # Color for highcovgthresholdline
+#
+# output_to_screen = FALSE,  # Show the plot in plot window?
+# filename = NA_character_,  # Path to save the plot
+# platform = "png", # Type of plot file (may be png, pdf, or wmf)
+# sizew = 7, # Width of the plot file in inches
+# sizeh = 6, # Height of the plot file in inches
+#
+# savedata = NA_character_,  # Path to save underlying data (if NA, data will not be saved)
+# savedatatype = "csv"       # File type for saving underlying data (may be csv or rds)
